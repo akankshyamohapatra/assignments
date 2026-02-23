@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, intial scale=1.0" />
+<title>mini counter list</title>
+
+<style>
+body{
+    background-color: white;
+    padding: 32px;
+}
+
+.container{
+    background-color: white;
+    padding: 4px;
+    width: 400px;
+    border: 4px solid black;
+}
+
+p{
+color: black;
+font-size: 14px;
+}
+
+button{
+    padding: 2px;
+    background-color: #4b6cb7;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-bottom: 30px;
+    margin-right: 10px;
+}
+
+button:hover {
+      background-color: #182848;
+    }
+
+.row{
+    display: flex;
+    flex-direction: row;
+    margin-right: 20px;
+    margin-bottom: 20px;
+}
+
+</style>
+</head>
+
+<body>
+<div class="container">
+<p>total sum: <span id="sum">0</span></p>
+
+<button type="button" id="addcounter">Add Counter</button>
+
+
+<div id="records">
+<!-- <div class="row">
+<p>counter #<span id="count">1</span>: </p>
+
+<button type="button" id="negativebtn">[-]</button>
+
+<span id="value">0</span>
+
+<button type="button" id="positivebtn">[+]</button>
+
+<button type="button" id="deletebtn">Delete</button>
+
+</div>
+</div> -->
+</div>
+
+
+
+
+<script>
+
+
+let counterBtnSelector = document.getElementById("addcounter");
+let counterListSelector = document.getElementById("records");
+let totalsumSelector=document.getElementById("sum");
+
+let count=0;
+let result=0;
+
+
+counterBtnSelector.addEventListener("click", function(){
+    count++;
+
+    let counterRecordRow =document.createElement("div");
+    counterRecordRow.className='row';
+
+    let paragraph=document.createElement("p");
+    paragraph.textContent= 'counter' + " " + '#' + count + ': ';
+
+    let minus=document.createElement("button");
+    minus.textContent="[-]";
+
+    let value=document.createElement("span");
+    value.textContent=" 0 ";
+    value.className='card';
+    let num=0;
+   
+    
+    
+
+    let plus=document.createElement("button");
+    plus.textContent="[+]";
+
+    let del=document.createElement("button");
+    del.textContent="[Delete]";
+
+
+
+    //+ button
+    plus.addEventListener("click", function(){
+    num++;
+ 
+    value.textContent=" " + num + " ";
+    console.log(Number(value.textContent));
+    })
+
+
+    //- button
+    minus.addEventListener("click", function(){
+    num--;
+    value.textContent=" " + num + "  ";
+   
+    })
+totalsumrecord();
+totalsumSelector.textContent=" " + result;
+
+    //delete button
+    del.addEventListener("click", function(){
+    counterRecordRow.remove();
+    updatecounterRecord();
+
+    })
+
+    counterRecordRow.append(paragraph,minus,value,plus,del);
+    counterListSelector.appendChild(counterRecordRow);
+
+
+
+    //function declaration
+    function updatecounterRecord(){
+
+    let counterRecordRows=counterListSelector.children;
+    for(let i=0; i<counterRecordRows.length; i++){
+        counterRecordRows[i].children[0].textContent='counter' + " " + '#' + (i+1) + ': ';
+        
+    }
+count=counterRecordRows.length;
+
+    }
+
+
+    //total sum function
+    function totalsumrecord(){
+
+        const values=document.querySelectorAll('.card')
+
+        values.forEach(card =>{
+// result+=Number(value.textContent);
+result+=num;
+        })
+    }
+   
+
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
