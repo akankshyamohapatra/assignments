@@ -121,6 +121,7 @@ counterBtnSelector.addEventListener("click", function(){
  
     value.textContent=" " + num + " ";
     console.log(Number(value.textContent));
+    updateTotalSum();
     })
 
 
@@ -128,16 +129,16 @@ counterBtnSelector.addEventListener("click", function(){
     minus.addEventListener("click", function(){
     num--;
     value.textContent=" " + num + "  ";
-   
+    updateTotalSum();
     })
-totalsumrecord();
-totalsumSelector.textContent=" " + result;
+// // totalsumrecord();
+// totalsumSelector.textContent=" " + result;
 
     //delete button
     del.addEventListener("click", function(){
     counterRecordRow.remove();
     updatecounterRecord();
-
+    updateTotalSum();
     })
 
     counterRecordRow.append(paragraph,minus,value,plus,del);
@@ -158,15 +159,15 @@ count=counterRecordRows.length;
     }
 
 
-    //total sum function
-    function totalsumrecord(){
+    function updateTotalSum() {
+        let sum = 0;
+        const values = document.querySelectorAll(".card");
 
-        const values=document.querySelectorAll('.card')
+        values.forEach(value => {
+            sum += Number(value.textContent);
+        });
 
-        values.forEach(card =>{
-// result+=Number(value.textContent);
-result+=num;
-        })
+        totalsumSelector.textContent = sum;
     }
    
 
