@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,intial scale=1.0"/>
+<title>notes app</title>
+
+<style>
+body{
+    background-color: white;
+    padding: 32px;
+}
+
+.container{
+    background-color: white;
+    padding: 4px;
+    width: 700px;
+    border: 4px solid black;
+}
+
+p{
+color: black;
+font-size: 14px;
+}
+
+button{
+    padding: 2px;
+    background-color: #4b6cb7;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-bottom: 30px;
+    margin-right: 10px;
+    width: 130px;
+}
+
+button:hover {
+      background-color: #182848;
+    }
+
+.row{
+    display: flex;
+    flex-direction: row;
+    margin-right: 40px;
+    margin-bottom: 20px;
+}
+
+hr{
+    background-color: black;
+    height: 2px;
+    margin-bottom: 30px;
+}
+
+input,
+    textarea {
+      padding: 2px;
+      border: 2px solid black;
+      border-radius: 5px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      width: 100%;
+      margin-right: 50px;
+    }
+
+
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<p>📝 Notes: <span id="totalnotes">0</span> |   Total Characters: <span id="totalcharacters">0</span></p>
+
+
+
+<p>[Write something...] <button type="button" id="addnote">[Add Note]</button></p>
+
+
+
+<hr>
+
+
+<div id="records">
+<!-- <div class="row">
+
+<input type="text" id="notes" name="notes" placeholder="write notes..." />
+
+
+<button type="button" id="deletebtn">[❌ Delete]</button>
+
+
+</div> -->
+</div>
+
+</div>
+
+<script>
+
+let addnotebtnselector=document.getElementById("addnote");
+let notelistselector=document.getElementById("records");
+let totalnotesselector=document.getElementById("totalnotes")
+let totalcharsselector=document.getElementById("totalcharacters")
+
+
+
+let count=0;
+
+
+
+addnotebtnselector.addEventListener("click",function(){
+
+count++;
+
+
+
+let noterow=document.createElement("div");
+noterow.className='row';
+
+let inputs=document.createElement("input");
+inputs.id="notes";
+inputs.type='text';
+inputs.name='notes';
+inputs.placeholder='write notes...'
+inputs.className="card";
+
+
+let del=document.createElement("button");
+del.textContent="[❌ Delete]"
+
+
+
+
+//delete button
+del.addEventListener("click",function(){
+
+    noterow.remove();
+  
+    updatetotalnotes();
+    updatetotalchars();
+
+})
+
+noterow.append(inputs,del);
+notelistselector.appendChild(noterow);
+
+updatetotalnotes();
+updatetotalchars();
+
+//update totalchars while typing
+inputs.addEventListener("input",function(){
+    
+updatetotalchars();
+
+})
+
+function updatetotalnotes(){
+
+    let noterows=notelistselector.children;
+
+    count= noterows.length;
+    totalnotesselector.textContent=count;
+}
+
+
+function updatetotalchars(){
+let totalchars=0;
+
+const chars=document.querySelectorAll(".card");
+
+chars.forEach(inputs =>{
+totalchars+=inputs.value.length;
+})
+totalcharsselector.textContent= totalchars;
+
+}
+
+})
+
+
+
+</script>
+
+</body>
+
+</html>

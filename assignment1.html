@@ -47,6 +47,7 @@ button:hover {
     margin-bottom: 20px;
 }
 
+
 </style>
 </head>
 
@@ -55,6 +56,7 @@ button:hover {
 <p>total sum: <span id="sum">0</span></p>
 
 <button type="button" id="addcounter">Add Counter</button>
+
 
 
 <div id="records">
@@ -87,8 +89,13 @@ let count=0;
 
 
 
+
+
 counterBtnSelector.addEventListener("click", function(){
     count++;
+
+   
+    
 
     let counterRecordRow =document.createElement("div");
     counterRecordRow.className='row';
@@ -142,6 +149,7 @@ counterBtnSelector.addEventListener("click", function(){
 
     counterRecordRow.append(paragraph,minus,value,plus,del);
     counterListSelector.appendChild(counterRecordRow);
+    
 
 
 
