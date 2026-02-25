@@ -150,7 +150,7 @@ updatetotalchars();
 
 //update totalchars while typing
 inputs.addEventListener("input",function(){
-    
+
 updatetotalchars();
 
 })
@@ -170,7 +170,7 @@ let totalchars=0;
 const chars=document.querySelectorAll(".card");
 
 chars.forEach(inputs =>{
-totalchars+=inputs.value.length;
+totalchars+=inputs.value.length; //Always read ".value.length" at the moment you calculate the total
 })
 totalcharsselector.textContent= totalchars;
 
