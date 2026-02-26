@@ -10,6 +10,9 @@
 body{
     background-color: white;
     padding: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .container{
@@ -17,6 +20,8 @@ body{
     padding: 4px;
     width: 700px;
     border: 4px solid black;
+    
+       
 }
 
 p{
@@ -33,7 +38,7 @@ button{
     transition: background 0.3s ease;
     margin-bottom: 30px;
     margin-right: 10px;
-    width: 130px;
+    width: 100px;
 }
 
 button:hover {
@@ -64,6 +69,16 @@ input,
       margin-right: 50px;
     }
 
+    .container1{
+        background-color: white;
+    padding: 4px;
+    width: 680px;
+    border: 4px solid white;
+    height: 500px;
+    /* vertical scroll */
+    overflow-y: auto;    
+    }
+
 
 </style>
 </head>
@@ -74,18 +89,19 @@ input,
 <p>📝 Notes: <span id="totalnotes">0</span> |   Total Characters: <span id="totalcharacters">0</span></p>
 
 
-
-<p>[Write something...] <button type="button" id="addnote">[Add Note]</button></p>
-
+<div class="row">
+<input type="text"  id="notes" name="notes" placeholder="Write something..." />
+<button type="button" id="addnote">Add Note</button>
+</div>
 
 
 <hr>
 
 
-<div id="records">
+<div id="records" class="container1">
 <!-- <div class="row">
 
-<input type="text" id="notes" name="notes" placeholder="write notes..." />
+<p> </p>
 
 
 <button type="button" id="deletebtn">[❌ Delete]</button>
@@ -102,6 +118,7 @@ let addnotebtnselector=document.getElementById("addnote");
 let notelistselector=document.getElementById("records");
 let totalnotesselector=document.getElementById("totalnotes")
 let totalcharsselector=document.getElementById("totalcharacters")
+let inputs=document.querySelector("input");
 
 
 
@@ -118,16 +135,26 @@ count++;
 let noterow=document.createElement("div");
 noterow.className='row';
 
-let inputs=document.createElement("input");
-inputs.id="notes";
-inputs.type='text';
-inputs.name='notes';
-inputs.placeholder='write notes...'
-inputs.className="card";
+
+let para0=document.createElement("p");
+para0.textContent=count + ":";
+
+
+let text=inputs.value    //read input
+let paragraph=document.createElement("p");
+paragraph.textContent= text;
+paragraph.className="card";
+
+
 
 
 let del=document.createElement("button");
-del.textContent="[❌ Delete]"
+del.textContent="Delete"
+
+
+
+let edit=document.createElement("button");
+edit.textContent="edit"
 
 
 
@@ -142,22 +169,45 @@ del.addEventListener("click",function(){
 
 })
 
-noterow.append(inputs,del);
+
+
+
+//edit button
+edit.addEventListener("click",function(){
+let ccc=paragraph.textContent;
+inputs.value=ccc;
+addnotebtnselector.textContent="update note";
+
+})
+
+
+
+noterow.append(para0,paragraph,del,edit);
 notelistselector.appendChild(noterow);
+
+
+addnotebtnselector.textContent="Add Note";
 
 updatetotalnotes();
 updatetotalchars();
 
 //update totalchars while typing
-inputs.addEventListener("input",function(){
+// inputs.addEventListener("input",function(){
 
-updatetotalchars();
+// updatetotalchars();
 
-})
+// })
+
+
+inputs.value="";    //clear input
 
 function updatetotalnotes(){
 
     let noterows=notelistselector.children;
+
+    for(let i=0; i<noterows.length; i++){
+        noterows[i].children[0].textContent=(i+1) + ":" ;
+    }
 
     count= noterows.length;
     totalnotesselector.textContent=count;
@@ -169,10 +219,11 @@ let totalchars=0;
 
 const chars=document.querySelectorAll(".card");
 
-chars.forEach(inputs =>{
-totalchars+=inputs.value.length; //Always read ".value.length" at the moment you calculate the total
+chars.forEach(paragraph =>{
+totalchars+=paragraph.textContent.length; //Always read ".value.length" at the moment you calculate the total
 })
 totalcharsselector.textContent= totalchars;
+
 
 }
 
