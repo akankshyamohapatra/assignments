@@ -123,10 +123,24 @@ let inputs=document.querySelector("input");
 
 
 let count=0;
-
+let editingrow=null;
 
 
 addnotebtnselector.addEventListener("click",function(){
+
+    //update same row
+    if(editingrow!==null){
+    let para=editingrow.querySelector(".card");
+    para.textContent=inputs.value;
+
+    editingrow=null;
+    addnotebtnselector.textContent="Add Note";
+    inputs.value="";
+
+    updatetotalchars();
+    return; //stops the function
+}
+
 
 count++;
 
@@ -178,7 +192,11 @@ let ccc=paragraph.textContent;
 inputs.value=ccc;
 addnotebtnselector.textContent="update note";
 
+editingrow=noterow;
+
 })
+
+
 
 
 
@@ -200,6 +218,17 @@ updatetotalchars();
 
 
 inputs.value="";    //clear input
+
+
+for(let i=notelistselector.children.length - 1; i>=0; i--){
+
+    notelistselector.appendChild(notelistselector.children[i]);
+
+}
+
+
+
+
 
 function updatetotalnotes(){
 
