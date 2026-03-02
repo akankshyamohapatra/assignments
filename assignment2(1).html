@@ -79,7 +79,31 @@ input,
     overflow-y: auto;    
     }
 
-    
+    .table-container{
+        width: 100%;
+    }
+
+    table{
+        width: max-content;
+        border-collapse: collapse;
+        background-color: white;
+    }
+    th,td{
+        padding: 8px 12px;
+        border: 1px solid black;
+        white-space: nowrap;
+    }
+
+
+    table td button {
+  padding: 4px 8px;
+  font-size: 0.9rem;
+  margin: 2px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
 
 </style>
 </head>
@@ -101,15 +125,38 @@ input,
 
 <div id="records" class="container1">
 
-<!-- <div class="row">
 
-<p> </p>
+    <div class="table-container">
+<table style="width: 100%" id="datatable">
+<thead>
+<tr> 
+<th style="width: 10%;">seial no.</th>
+<th style="width: 60%;">notes</th>
+<th>actions</th>
+
+</tr>
+
+</thead>
 
 
-<button type="button" id="deletebtn">[❌ Delete]</button>
+<tbody>
+    <!-- <tr>
+        <td>1</td>
+        <td>abc</td>
+        <td> delete  edit</td>
+    </tr> -->
 
+    <!-- <tr>
+        <td>2</td>
+        <td>bbb</td>
+        <td> delete  edit</td>
+    </tr> -->
+</tbody>
 
-</div> -->
+</table>
+
+    </div>
+
 </div>
 
 </div>
@@ -121,6 +168,10 @@ let notelistselector=document.getElementById("records");
 let totalnotesselector=document.getElementById("totalnotes")
 let totalcharsselector=document.getElementById("totalcharacters")
 let inputs=document.querySelector("input");
+
+
+let tablebody=document.getElementById("datatable").querySelector("tbody");
+// let tableBody = document.querySelector("#datatable tbody");  //you can write this line instead of above line
 
 
 
@@ -148,32 +199,30 @@ count++;
 
 
 
-let noterow=document.createElement("div");
-noterow.className='row';
+let noterow=document.createElement("tr");   //tr--->table row
 
 
-let para0=document.createElement("p");
-para0.textContent=count + ":";
+let tdserial=document.createElement("td");   //td---->table data cell
+tdserial.textContent=count;
 
 
-let text=inputs.value    //read input
-let paragraph=document.createElement("p");
-paragraph.textContent= text;
-paragraph.className="card";
+let tdnote=document.createElement("td");
+tdnote.textContent=inputs.value;  //read the input
+tdnote.className="card";
 
 
+let tdactions=document.createElement("td");
 
 
 let del=document.createElement("button");
 del.textContent="Delete"
 
 
-
 let edit=document.createElement("button");
 edit.textContent="edit"
 
 
-
+tdactions.append(edit,del);
 
 //delete button
 del.addEventListener("click",function(){
@@ -190,7 +239,7 @@ del.addEventListener("click",function(){
 
 //edit button
 edit.addEventListener("click",function(){
-let ccc=paragraph.textContent;
+let ccc=tdnote.textContent;
 inputs.value=ccc;
 addnotebtnselector.textContent="update note";
 
@@ -202,8 +251,8 @@ editingrow=noterow;
 
 
 
-noterow.append(para0,paragraph,del,edit);
-notelistselector.appendChild(noterow);
+noterow.append(tdserial,tdnote,tdactions);
+tablebody.appendChild(noterow);
 
 
 addnotebtnselector.textContent="Add Note";
@@ -223,9 +272,9 @@ inputs.value="";    //clear input
 
 
 //reverse the rows
-for(let i=notelistselector.children.length - 1; i>=0; i--){
+for(let i=tablebody.children.length - 1; i>=0; i--){
 
-    notelistselector.appendChild(notelistselector.children[i]);
+   tablebody.appendChild(tablebody.children[i]);
 
 }
 
@@ -235,13 +284,13 @@ for(let i=notelistselector.children.length - 1; i>=0; i--){
 
 function updatetotalnotes(){
 
-    let noterows=notelistselector.children;
+   let rows=tablebody.querySelectorAll("tr");
 
-    for(let i=0; i<noterows.length; i++){
-        noterows[i].children[0].textContent=(i+1) + ":" ;
-    }
+   rows.forEach((row,index) =>{    //row---->current tr  , index → position of the row (starts from 0)
+   row.children[0].textContent= index + 1;    //1st row  => index 0, 2nd row  => index 1 , 3rd row  => index 2
+   })
 
-    count= noterows.length;
+    count= rows.length;
     totalnotesselector.textContent=count;
 }
 
@@ -251,8 +300,8 @@ let totalchars=0;
 
 const chars=document.querySelectorAll(".card");
 
-chars.forEach(paragraph =>{
-totalchars+=paragraph.textContent.length; //Always read ".value.length" at the moment you calculate the total
+chars.forEach(tdnote=>{
+totalchars+=tdnote.textContent.length; //Always read ".value.length" at the moment you calculate the total
 })
 totalcharsselector.textContent= totalchars;
 
