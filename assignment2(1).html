@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,intial scale=1.0"/>
-<title>notes app</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Notes App</title>
 
 <style>
 body{
@@ -12,308 +11,183 @@ body{
     padding: 32px;
     display: flex;
     justify-content: center;
-    align-items: center;
 }
 
 .container{
-    background-color: white;
-    padding: 4px;
     width: 700px;
     border: 4px solid black;
-    
-       
+    padding: 10px;
 }
 
 p{
-color: black;
-font-size: 14px;
+    font-size: 14px;
 }
 
 button{
-    padding: 2px;
+    padding: 4px;
     background-color: #4b6cb7;
     color: white;
     font-size: 1rem;
     cursor: pointer;
-    transition: background 0.3s ease;
-    margin-bottom: 30px;
     margin-right: 10px;
     width: 100px;
 }
 
 button:hover {
-      background-color: #182848;
-    }
+    background-color: #182848;
+}
 
 .row{
     display: flex;
-    flex-direction: row;
-    margin-right: 40px;
     margin-bottom: 20px;
 }
 
-hr{
-    background-color: black;
-    height: 2px;
-    margin-bottom: 30px;
+input{
+    padding: 6px;
+    border: 2px solid black;
+    border-radius: 5px;
+    font-size: 1rem;
+    width: 100%;
+    margin-right: 10px;
 }
 
-input,
-    textarea {
-      padding: 2px;
-      border: 2px solid black;
-      border-radius: 5px;
-      font-size: 1rem;
-      box-sizing: border-box;
-      width: 100%;
-      margin-right: 50px;
-    }
-
-    .container1{
-        background-color: white;
-    padding: 4px;
-    width: 680px;
-    border: 4px solid white;
-    height: 500px;
-    /* vertical scroll */
-    overflow-y: auto;    
-    }
-
-    .table-container{
-        width: 100%;
-    }
-
-    table{
-        width: max-content;
-        border-collapse: collapse;
-        background-color: white;
-    }
-    th,td{
-        padding: 8px 12px;
-        border: 1px solid black;
-        white-space: nowrap;
-    }
-
-
-    table td button {
-  padding: 4px 8px;
-  font-size: 0.9rem;
-  margin: 2px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+.container1{
+    height: 400px;
+    overflow-y: auto;
 }
 
+table{
+    width: 100%;
+    border-collapse: collapse;
+}
 
+th,td{
+    padding: 8px 12px;
+    border: 1px solid black;
+}
+
+thead th{
+    position: sticky;
+    top: 0;
+    background: white;
+}
 </style>
 </head>
 
 <body>
 <div class="container">
 
-<p>📝 Notes: <span id="totalnotes">0</span> |   Total Characters: <span id="totalcharacters">0</span></p>
-
+<p>
+📝 Notes: <span id="totalnotes">0</span> |
+Total Characters: <span id="totalcharacters">0</span>
+</p>
 
 <div class="row">
-<input type="text"  id="notes" name="notes" placeholder="Write something..." />
+<input type="text" id="notes" placeholder="Write something..." />
 <button type="button" id="addnote">Add Note</button>
 </div>
 
-
 <hr>
 
-
-<div id="records" class="container1">
-
-
-    <div class="table-container">
-<table style="width: 100%" id="datatable">
+<div class="container1">
+<table id="datatable">
 <thead>
-<tr> 
-<th style="width: 10%;">seial no.</th>
-<th style="width: 60%;">notes</th>
-<th>actions</th>
-
+<tr>
+<th style="width:10%">Serial</th>
+<th style="width:60%">Note</th>
+<th>Actions</th>
 </tr>
-
 </thead>
-
-
-<tbody>
-    <!-- <tr>
-        <td>1</td>
-        <td>abc</td>
-        <td> delete  edit</td>
-    </tr> -->
-
-    <!-- <tr>
-        <td>2</td>
-        <td>bbb</td>
-        <td> delete  edit</td>
-    </tr> -->
-</tbody>
-
+<tbody></tbody>
 </table>
-
-    </div>
-
 </div>
 
 </div>
 
 <script>
 
-let addnotebtnselector=document.getElementById("addnote");
-let notelistselector=document.getElementById("records");
-let totalnotesselector=document.getElementById("totalnotes")
-let totalcharsselector=document.getElementById("totalcharacters")
-let inputs=document.querySelector("input");
+const addBtn = document.getElementById("addnote");
+const input = document.getElementById("notes");
+const totalNotes = document.getElementById("totalnotes");
+const totalChars = document.getElementById("totalcharacters");
+const tableBody = document.querySelector("#datatable tbody");
 
+let editingRow = null;
 
-let tablebody=document.getElementById("datatable").querySelector("tbody");
-// let tableBody = document.querySelector("#datatable tbody");  //you can write this line instead of above line
+addBtn.addEventListener("click", function(){
 
+    if(input.value.trim() === "") return;
 
+    // UPDATE MODE
+    if(editingRow !== null){
+        editingRow.querySelector(".note-text").textContent = input.value;
+        editingRow = null;
+        addBtn.textContent = "Add Note";
+        input.value = "";
+        updateTotalChars();
+        return;
+    }
 
-let count=0;
-let editingrow=null;
+    // CREATE NEW ROW
+    const row = document.createElement("tr");
 
+    const tdSerial = document.createElement("td");
 
-addnotebtnselector.addEventListener("click",function(){
+    const tdNote = document.createElement("td");
+    tdNote.textContent = input.value;
+    tdNote.className = "note-text";
 
-    //update same row
-    if(editingrow!==null){
-    let para=editingrow.querySelector(".card");
-    para.textContent=inputs.value;
+    const tdActions = document.createElement("td");
 
-    editingrow=null;
-    addnotebtnselector.textContent="Add Note";
-    inputs.value="";
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "Edit";
 
-    updatetotalchars();
-    return; //stops the function
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "Delete";
+
+    tdActions.append(editBtn, delBtn);
+    row.append(tdSerial, tdNote, tdActions);
+
+    // 🔥 IMPORTANT: New note goes to TOP (Descending order)
+    tableBody.prepend(row);
+
+    // DELETE
+    delBtn.addEventListener("click", function(){
+        row.remove();
+        updateTotalNotes();
+        updateTotalChars();
+    });
+
+    // EDIT
+    editBtn.addEventListener("click", function(){
+        input.value = tdNote.textContent;
+        editingRow = row;
+        addBtn.textContent = "Update Note";
+    });
+
+    input.value = "";
+
+    updateTotalNotes();
+    updateTotalChars();
+});
+
+function updateTotalNotes(){
+    const rows = tableBody.querySelectorAll("tr");
+    rows.forEach((row, index)=>{
+        row.children[0].textContent = index + 1;
+    });
+    totalNotes.textContent = rows.length;
 }
 
-
-count++;
-
-
-
-let noterow=document.createElement("tr");   //tr--->table row
-
-
-let tdserial=document.createElement("td");   //td---->table data cell
-tdserial.textContent=count;
-
-
-let tdnote=document.createElement("td");
-tdnote.textContent=inputs.value;  //read the input
-tdnote.className="card";
-
-
-let tdactions=document.createElement("td");
-
-
-let del=document.createElement("button");
-del.textContent="Delete"
-
-
-let edit=document.createElement("button");
-edit.textContent="edit"
-
-
-tdactions.append(edit,del);
-
-//delete button
-del.addEventListener("click",function(){
-
-    noterow.remove();
-  
-    updatetotalnotes();
-    updatetotalchars();
-
-})
-
-
-
-
-//edit button
-edit.addEventListener("click",function(){
-let ccc=tdnote.textContent;
-inputs.value=ccc;
-addnotebtnselector.textContent="update note";
-
-editingrow=noterow;
-
-})
-
-
-
-
-
-noterow.append(tdserial,tdnote,tdactions);
-tablebody.appendChild(noterow);
-
-
-addnotebtnselector.textContent="Add Note";
-
-updatetotalnotes();
-updatetotalchars();
-
-//update totalchars while typing
-// inputs.addEventListener("input",function(){
-
-// updatetotalchars();
-
-// })
-
-
-inputs.value="";    //clear input
-
-
-//reverse the rows
-for(let i=tablebody.children.length - 1; i>=0; i--){
-
-   tablebody.appendChild(tablebody.children[i]);
-
+function updateTotalChars(){
+    let total = 0;
+    document.querySelectorAll(".note-text").forEach(td=>{
+        total += td.textContent.length;
+    });
+    totalChars.textContent = total;
 }
-
-
-
-
-
-function updatetotalnotes(){
-
-   let rows=tablebody.querySelectorAll("tr");
-
-   rows.forEach((row,index) =>{    //row---->current tr  , index → position of the row (starts from 0)
-   row.children[0].textContent= index + 1;    //1st row  => index 0, 2nd row  => index 1 , 3rd row  => index 2
-   })
-
-    count= rows.length;
-    totalnotesselector.textContent=count;
-}
-
-
-function updatetotalchars(){
-let totalchars=0;
-
-const chars=document.querySelectorAll(".card");
-
-chars.forEach(tdnote=>{
-totalchars+=tdnote.textContent.length; //Always read ".value.length" at the moment you calculate the total
-})
-totalcharsselector.textContent= totalchars;
-
-
-}
-
-})
-
-
 
 </script>
 
 </body>
-
 </html>

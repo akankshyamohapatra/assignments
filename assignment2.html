@@ -153,7 +153,7 @@ noterow.className='row';
 
 
 let para0=document.createElement("p");
-para0.textContent=count + ":";
+//para0.textContent=count + ":";
 
 
 let text=inputs.value    //read input
@@ -203,7 +203,8 @@ editingrow=noterow;
 
 
 noterow.append(para0,paragraph,del,edit);
-notelistselector.appendChild(noterow);
+// notelistselector.appendChild(noterow);
+notelistselector.prepend(noterow);
 
 
 addnotebtnselector.textContent="Add Note";
