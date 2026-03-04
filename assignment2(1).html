@@ -173,7 +173,7 @@ addBtn.addEventListener("click", function(){
 
 function updateTotalNotes(){
     const rows = tableBody.querySelectorAll("tr");
-    rows.forEach((row, index)=>{
+    rows.forEach((row, index)=>{     //here row is row, not variable
         row.children[0].textContent = index + 1;
     });
     totalNotes.textContent = rows.length;
