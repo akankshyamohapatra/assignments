@@ -112,19 +112,38 @@ const totalNotes = document.getElementById("totalnotes");
 const totalChars = document.getElementById("totalcharacters");
 const tableBody = document.querySelector("#datatable tbody");
 
+loadtable();
+
 let editingRow = null;
 
+// localStorage.setItem("myCat", "Tom");
+// localStorage.setItem("lizy", "busy");
+// localStorage.setItem(input.value,1);
+// localStorage.setItem("username",input.value);
+// let name=localStorage.getItem("username");
+// console.log(name);
+
+//localStorage.removeItem("myCat");
+//localStorage.clear();
+
+
+//let count=0;
 addBtn.addEventListener("click", function(){
 
     if(input.value.trim() === "") return;
 
+    //count++;
+
     // UPDATE MODE
     if(editingRow !== null){
+        
+
         editingRow.querySelector(".note-text").textContent = input.value;
         editingRow = null;
         addBtn.textContent = "Add Note";
         input.value = "";
         updateTotalChars();
+        savetable();
         return;
     }
 
@@ -137,6 +156,14 @@ addBtn.addEventListener("click", function(){
     tdNote.textContent = input.value;
     tdNote.className = "note-text";
 
+    //localStorage.setItem(count, input.value);
+    // let name=localStorage.getItem(count);
+    // console.log(name);
+
+    // localStorage.setItem("username",input.value);
+    // let name=localStorage.getItem("username");
+    // console.log(name);
+
     const tdActions = document.createElement("td");
 
     const editBtn = document.createElement("button");
@@ -148,14 +175,18 @@ addBtn.addEventListener("click", function(){
     tdActions.append(editBtn, delBtn);
     row.append(tdSerial, tdNote, tdActions);
 
+    
+
     // 🔥 IMPORTANT: New note goes to TOP (Descending order)
     tableBody.prepend(row);
+
 
     // DELETE
     delBtn.addEventListener("click", function(){
         row.remove();
         updateTotalNotes();
         updateTotalChars();
+        savetable();
     });
 
     // EDIT
@@ -163,28 +194,127 @@ addBtn.addEventListener("click", function(){
         input.value = tdNote.textContent;
         editingRow = row;
         addBtn.textContent = "Update Note";
+       
     });
 
     input.value = "";
 
     updateTotalNotes();
     updateTotalChars();
+    savetable();
 });
 
 function updateTotalNotes(){
     const rows = tableBody.querySelectorAll("tr");
-    rows.forEach((row, index)=>{     //here row is row, not variable
-        row.children[0].textContent = index + 1;
+    rows.forEach((row, index)=>{     //here row is row(tr), not variable
+        row.children[0].textContent = index + 1; //1st row --->index=0, 2nd row --->index=1, 3rd row ---->index=2
     });
     totalNotes.textContent = rows.length;
 }
 
 function updateTotalChars(){
     let total = 0;
-    document.querySelectorAll(".note-text").forEach(td=>{
-        total += td.textContent.length;
+    document.querySelectorAll(".note-text").forEach(item=>{
+        total += item.textContent.length;
     });
     totalChars.textContent = total;
+}
+
+
+
+
+
+function savetable(){
+const rows= Array.from(tableBody.children);
+
+const data= rows.map(row =>{
+return {
+    count: row.children[0].textContent,
+    note: row.children[1].textContent,
+    button: row.children[2].textContent
+};
+
+});
+
+localStorage.setItem("notes",JSON.stringify(data));
+
+}
+
+
+
+
+function loadtable(){
+    const stored= localStorage.getItem("notes");
+
+    if(!stored){
+        return;
+    }
+
+    const datas = JSON.parse(stored);
+
+    datas.forEach(item =>{
+    createrow(item.note);
+
+    });
+}
+
+
+
+
+function createrow(text){
+
+    let rown= document.createElement("tr");
+
+    let td1=document.createElement("td");
+    //td1.textContent=tableBody.children.length + 1;
+
+    let td2=document.createElement("td");
+    td2.textContent=text;
+    td2.className="note-text";
+
+    let td3=document.createElement("td");
+
+    let editBtn=document.createElement("button");
+    editBtn.textContent="Edit";
+
+    let del= document.createElement("button");
+    del.textContent="Delete";
+
+
+    //delete
+    del.addEventListener("click", function(){
+
+        rown.remove();
+        updateTotalNotes();
+        updateTotalChars();
+        savetable();
+       
+    })
+
+    //edit
+    editBtn.addEventListener("click", function(){
+        input.value = td2.textContent;
+        editingRow = rown;
+        addBtn.textContent = "Update Note";
+        
+    });
+
+    input.value = "";
+
+
+
+
+    
+    td3.append(editBtn,del);
+    rown.append(td1,td2,td3);
+    tableBody.appendChild(rown);
+
+
+    updateTotalNotes();
+    updateTotalChars();
+
+
+
 }
 
 </script>
