@@ -8,6 +8,14 @@
     <title>Checklist Manager</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            /* outline: 3px solid orangered;
+    background-color: white; */
+        }
+
         body {
             background-color: white;
             padding: 32px;
@@ -50,8 +58,8 @@
             border: 2px solid black;
             border-radius: 5px;
             font-size: 1rem;
-            width: 30%;
-            margin-right: 10px;
+            width: 90%;
+            margin-right: 70px;
         }
 
         .container1 {
@@ -79,6 +87,66 @@
         td:nth-child(4) {
             text-align: right;
         }
+
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 0px;
+            /* space below input */
+            /* min-height: 0.1em; */
+            /* keeps space even when empty */
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .rowx {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .container2 {
+            display: flex;
+            flex-direction: row;
+        }
+
+        hr {
+            margin-bottom: 10px;
+            margin-top: 10px;
+        }
+
+        /* mobile version */
+        @media (min-width:412px) and (max-width:600px) {
+            body {
+                padding: 16px;
+            }
+
+            .container2 {
+                flex-direction: column;
+
+            }
+
+            .container {
+                width: 380px;
+                height: 883px;
+            }
+
+            hr {
+                margin-bottom: 20px;
+                margin-top: 20px;
+            }
+
+            .column {
+                margin-top: 0px;
+            }
+
+            .rowx {
+                margin-bottom: 20px;
+            }
+
+        }
     </style>
 
 </head>
@@ -87,14 +155,35 @@
 
     <div class="container">
 
-        <p>
-            Item: <input type="text" id="items" placeholder="write items..." />
 
-            Price: <input type="number" id="price" />
+        <div class="container2">
+
+            <div class="rowx">
+                <!-- &nbsp-- for one space  -->
+                Item:&nbsp;
+                <div class="column">
+                    <input type="text" id="items" placeholder="Enter Item Name" />
+
+
+                    <div class="error-message" id="itemError"></div>
+                </div>
+            </div>
+
+
+
+            <div class="rowx">
+                Price:&nbsp;
+                <div class="column">
+                    <input type="number" id="price" placeholder="Enter Price" />
+
+                    <div class="error-message" id="priceError"></div>
+                </div>
+            </div>
+
 
             <button type="button" id="additem">Add Item</button>
+        </div>
 
-        </p>
 
         <hr>
 
@@ -137,6 +226,8 @@
         const tableBody = document.querySelector("#datatable tbody");
         const completedItems = document.getElementById("Completed");
         const completedPrice = document.getElementById("Completedprice");
+        const itemErrorSelector = document.getElementById("itemError");
+        const priceErrorSelector = document.getElementById("priceError");
 
 
 
@@ -154,14 +245,11 @@
 
             const newPrice = Number(inputPrice.value.trim());   //inputPrice.value ----> a string,   Number(inputPrice.value) ---->convert string to number
 
-            if (!validateInput(newItem)) {
+            if (!validateInput(newItem, newPrice)) {
                 return;
             }
 
-            if (!(newPrice) || newPrice <= 0) {
-                alert("please enter valid price");
-                return;
-            }
+
 
 
             //update mode
@@ -174,11 +262,24 @@
                 addRow(newItem, newPrice);
             }
 
-            
+
 
         })
 
 
+        //prevent typing non-numbers
+        inputPrice.addEventListener("input", function () {
+            
+            if (Number(inputPrice.value) < 1 ) {
+                inputPrice.value = "";
+                priceErrorSelector.textContent = "please enter valid price";
+                inputPrice.style.border = "2px solid red";
+            } else {
+                priceErrorSelector.textContent = "";
+                inputPrice.style.border = "2px solid black";
+            }
+
+        })
 
 
 
@@ -337,22 +438,64 @@
         }
 
 
-        function validateInput(newText) {
-            //for empty input
-            if (!newText) {
-                alert("item cannot be empty");
-                return false;
-            }
+        function validateInput(newText, newPrice) {
 
-            //for duplicate input
-            const duplicate = items.some((product, index) => product.item.toLowerCase() == newText.toLowerCase() && index !== editingIndex);
+            let isValid=true;
+
+            // clear previous errors first
+            itemErrorSelector.textContent = "";
+            priceErrorSelector.textContent = "";
+
+            inputItems.style.border = "2px solid black";
+            inputPrice.style.border = "2px solid black";
+
+           
+
+
+            //for empty item input
+            if (!newText) {
+                itemErrorSelector.textContent = "item cannot be empty";
+
+                inputItems.style.border = "2px solid red";
+
+                //alert("item cannot be empty");
+
+             //return false;  
+             isValid=false; 
+            } 
+
+
+            //for duplicate item input
+            const duplicate = items.some((product, index) => product.item.toLowerCase() === newText.toLowerCase() && index !== editingIndex);
 
             if (duplicate) {
-                alert("item already exists!");
-                return false;
+                itemErrorSelector.textContent = "item already exists!";
+                inputItems.style.border = "2px solid red";
+                //alert("item already exists!");
+                //return false;
+                isValid=false;
             }
 
-            return true;
+
+
+            //for empty input price
+            if (!newPrice || newPrice <= 0) {
+
+                priceErrorSelector.textContent = "price cannot be empty";
+                inputPrice.style.border = "2px solid red";
+                //alert("please enter valid price");
+
+                //return false;
+                isValid=false;
+            }
+
+            
+
+
+
+
+           // return true;
+           return isValid;
         }
 
 
@@ -366,6 +509,9 @@
 
             inputItems.value = "";
             inputPrice.value = "";
+
+            itemErrorSelector.textContent = "";
+            priceErrorSelector.textContent = "";
 
             addBtn.textContent = "Add Item";
 
