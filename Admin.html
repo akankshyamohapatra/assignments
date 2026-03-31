@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Presenter Dashboard</title>
+    <title>Admin Dashboard</title>
 
 
     <style>
@@ -99,10 +99,14 @@
 
             <p><b>Poll Question:</b></p>
 
+            <div id="question"></div>
+
             <input type="text" id="questionInput" placeholder="Poll Question"
                 style="margin-bottom: 40px; height: 40px;">
 
             <p><b>Options:</b></p>
+
+            <div id="options"></div>
 
             <input type="text" class="option" placeholder="Option 1">
 
@@ -170,8 +174,11 @@
         const resultsSection = document.getElementById("results");
         const pollQuestion = document.getElementById("questionInput");
         const optionInputs = document.querySelectorAll(".option");
+        const totalVotes=document.getElementById("totalVotes");
+        const questionSelector=document.getElementById("question");
+        const optionSelector=document.getElementById("options");
 
-
+//localStorage.clear();
         loadData();
 
         createPollBtn.addEventListener("click", function () {
@@ -198,6 +205,26 @@
             if (existingPoll && pollQuestion.value === existingPoll.question && isValid) {
 
                 alert("poll already exists!");
+
+                pollQuestion.style.display="none";
+
+               questionSelector.textContent= pollQuestion.value;
+
+            optionInputs.forEach(input => {
+            input.style.display="none";
+
+            })
+
+            optionSelector.innerHTML="";
+
+            optionInputs.forEach(input => {
+
+            optionSelector.innerHTML += `<p> ${input.value} </p>`;
+
+            })
+
+
+                
                 return;
 
             } else {
@@ -237,6 +264,25 @@
 
                 savePoll(poll);
 
+                pollQuestion.style.display="none";
+
+               questionSelector.textContent= pollQuestion.value;
+
+            optionInputs.forEach(input => {
+            input.style.display="none";
+
+            })
+
+            optionSelector.innerHTML="";
+
+            optionInputs.forEach(input => {
+
+            optionSelector.innerHTML += `<p> ${input.value} </p>`;
+
+            })
+
+               
+
                 //loadData();
 
                 alert("poll created");
@@ -251,27 +297,17 @@
 
             const poll = getPoll();
 
-            let isValid = true;
-
-
-
-            for (const input of optionInputs) {
-
-                if (input.value.trim() === "") {
-
-                    isValid = false;
-                    break;   //stop for loop
-                }
-
-            }
-
-            if (!poll || !pollQuestion.value.trim() || !isValid) {
+            if(!poll){
                 alert("create poll first");
                 return;
-
             }
 
-            
+            if(poll.isActive){
+                alert("poll already started");
+                return;
+            }
+
+           
 
             poll.isActive = true;
 
@@ -295,22 +331,9 @@
                 return;
             }
 
-            let isValid = true;
-
-            for (const input of optionInputs) {
-
-                if (input.value.trim() === "") {
-
-                    isValid = false;
-                    break;   //stop for loop
-                }
-
-            }
-
-            if (!pollQuestion.value.trim() || !isValid) {
-                alert("create poll first");
+            if(!poll.isActive){
+                alert("poll already stopped");
                 return;
-
             }
 
             poll.isActive = false;
@@ -401,6 +424,17 @@
                 resultsSection.innerHTML += `<p> ${option.text} : ${option.votes}</p>`
 
             })
+
+
+
+            let total=0;
+
+            poll.options.forEach(option => {
+            total += Number(option.votes);
+
+            })
+
+            totalVotes.textContent= total;
 
         }
 

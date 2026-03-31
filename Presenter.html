@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Presenter Dashboard</title>
+
+    <style>
+        body {
+            background-color: white;
+            padding: 32px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            border: 4px solid black;
+            padding: 20px;
+
+            width: 60%;
+        }
+
+        button {
+            padding: 4px;
+            background-color: #4b6cb7;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 20px;
+            width: 100px;
+        }
+
+        button:hover {
+            background-color: #182848;
+        }
+
+
+        h2 {
+            color: black;
+            text-align: center;
+        }
+
+        p {
+            font-size: 14px;
+        }
+
+        .ttt {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            /* space between radio & text */
+            margin-bottom: 8px;
+        }
+    </style>
+
+
+</head>
+
+
+<body>
+
+    <div class="container">
+
+        <h2 style="color: red; font-size: 30px;">Presenter Dashboard</h2>
+
+        <p class="heading"><b> Question:</b></p>
+
+        <p id="question"></p><br>
+
+        <p class="heading"><b>Options:</b></p>
+
+        <div id="options"></div>
+
+        <button type="button" id="submitBtn">Submit Vote</button>
+
+        <div id="message"></div>
+
+        <hr>
+
+        <p><b>Results:</b></p>
+
+        <div id="results"></div>
+
+
+    </div>
+
+
+
+    <script>
+
+        const messageDiv = document.getElementById("message");
+        const pollQuestion = document.getElementById("question");
+        const optionsDiv = document.getElementById("options");
+        const submitBtn = document.getElementById("submitBtn");
+        const headingSelector = document.querySelectorAll(".heading");
+        const resultsSection = document.getElementById("results");
+
+
+        //localStorage.clear();
+
+        loadData();
+
+
+        renderPoll();
+
+        submitBtn.addEventListener("click", function () {
+
+
+
+            if (submitVote()) {
+                pollQuestion.style.display = "none";
+
+                optionsDiv.style.display = "none";
+
+                submitBtn.style.display = "none";
+
+                headingSelector.forEach(el => {
+                    el.style.display = "none";
+                });
+
+            } else {
+
+                pollQuestion.style.display = "block";
+
+                optionsDiv.style.display = "block";
+
+            }
+
+
+
+        })
+
+
+
+
+        //functions
+
+        function savePoll(poll) {
+            localStorage.setItem("pollData", JSON.stringify(poll));
+        }
+
+
+
+        function getPoll() {
+            return JSON.parse(localStorage.getItem("pollData"));
+        }
+
+
+
+        function renderPoll() {
+
+            //messageDiv.textContent="";
+
+            const poll = getPoll();
+
+            if (!poll) {
+                messageDiv.textContent = "No Poll Available";
+
+                submitBtn.style.display = "none";
+
+                headingSelector.forEach(el => {
+                    el.style.display = "none";
+                });
+
+                return;
+
+            }
+
+
+            if (!poll.isActive) {
+                messageDiv.textContent = "Poll not started yet";
+
+                submitBtn.style.display = "none";
+
+                headingSelector.forEach(el => {
+                    el.style.display = "none";
+                });
+                return;
+            }
+
+
+            pollQuestion.textContent = poll.question;
+
+            optionsDiv.innerHTML = "";
+
+            poll.options.forEach((option, index) => {
+
+                optionsDiv.innerHTML +=
+                    ` <label class="ttt">
+    <input type="radio" name="vote" value="${index}">
+    ${option.text}
+</label><br>`;
+
+            })
+
+        }
+
+
+
+        function submitVote() {
+
+            const poll = getPoll();
+
+            if (!poll) {
+                alert("No poll found");
+                return false;
+            }
+
+            const selected = document.querySelector('input[name="vote"]:checked');
+
+            if (!selected) {
+                alert("select option");
+                return false;
+            }
+
+            const index = Number(selected.value);
+
+
+
+            poll.options[index].votes++;
+
+            savePoll(poll);
+
+
+            if (poll.showResults === true) {
+                resultsSection.style.display = "block";
+
+                renderResults(poll);
+
+            } else {
+
+                resultsSection.style.display = "none";
+            }
+
+
+          
+
+            localStorage.setItem("hasVoted", "true");
+
+            messageDiv.textContent = "Vote Submitted";
+
+
+
+            return true;
+
+        }
+
+
+        function loadData() {
+
+            const data = getPoll();
+
+            if (!data) {
+                return;
+            }
+
+            const hasVoted = localStorage.getItem("hasVoted");
+
+
+            if (hasVoted === "true") {
+
+                pollQuestion.style.display = "none";
+
+                optionsDiv.style.display = "none";
+
+                submitBtn.style.display = "none";
+
+                headingSelector.forEach(el => {
+                    el.style.display = "none";
+                });
+
+                messageDiv.textContent = "you already voted";
+
+
+            } else {
+
+                pollQuestion.style.display = "block";
+
+                optionsDiv.style.display = "block";
+
+            }
+
+
+            if (data.showResults === true) {
+                resultsSection.style.display = "block";
+
+                renderResults(data);
+
+            } else {
+
+                resultsSection.style.display = "none";
+            }
+
+
+
+        }
+
+
+        function renderResults(poll) {
+
+            resultsSection.innerHTML = "";
+
+            poll.options.forEach(option => {
+
+                resultsSection.innerHTML += `<p> ${option.text} : ${option.votes} </p>`;
+
+            })
+
+        }
+
+
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+
+</html>
