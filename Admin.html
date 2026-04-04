@@ -47,7 +47,7 @@
             border-radius: 5px;
             font-size: 1rem;
             width: 90%;
-            margin-bottom: 10px;
+            /* margin-bottom: 10px; */
         }
 
         h2 {
@@ -86,6 +86,31 @@
             width: 100%;
             margin-bottom: 20px;
         }
+
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 0px;
+            margin-bottom: 10px;
+            /* space below input */
+            /* min-height: 0.1em; */
+            /* keeps space even when empty */
+        }
+
+        .progress-container {
+            width: 70%;
+            background-color: #ddd;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background-color: #4b6cb7;
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
     </style>
 </head>
 
@@ -97,12 +122,16 @@
             <h2 style="color: red; font-size: 30px;">Admin Dashboard</h2>
 
 
+            <p class="error-message" id="messageError"></p>
+
             <p><b>Poll Question:</b></p>
 
             <div id="question"></div>
 
-            <input type="text" id="questionInput" placeholder="Poll Question"
-                style="margin-bottom: 40px; height: 40px;">
+            <input type="text" id="questionInput" placeholder="Poll Question" style="height: 40px;">
+
+
+            <div class="error-message" id="questionError" style="margin-bottom: 40px;"></div>
 
             <p><b>Options:</b></p>
 
@@ -110,9 +139,15 @@
 
             <input type="text" class="option" placeholder="Option 1">
 
+            <div class="error-message" id="optionError1"></div>
+
             <input type="text" class="option" placeholder="Option 2">
 
-            <input type="text" class="option" placeholder="Option 3" style="margin-bottom: 20px;">
+            <div class="error-message" id="optionError2"></div>
+
+            <input type="text" class="option" placeholder="Option 3">
+
+            <div class="error-message" id="optionError3"></div>
 
             <hr>
 
@@ -174,15 +209,27 @@
         const resultsSection = document.getElementById("results");
         const pollQuestion = document.getElementById("questionInput");
         const optionInputs = document.querySelectorAll(".option");
-        const totalVotes=document.getElementById("totalVotes");
-        const questionSelector=document.getElementById("question");
-        const optionSelector=document.getElementById("options");
+        const totalVotes = document.getElementById("totalVotes");
+        const questionSelector = document.getElementById("question");
+        const optionSelector = document.getElementById("options");
+        const questionErrorSelector = document.getElementById("questionError");
+        const firstOptionErrorSelector = document.getElementById("optionError1");
+        const secOptionErrorSelector = document.getElementById("optionError2");
+        const thirdOptionErrorSelector = document.getElementById("optionError3");
+        const messageErrorSelector = document.getElementById("messageError");
 
-//localStorage.clear();
+
+
+
+
+
+
+        //localStorage.clear();
         loadData();
 
         createPollBtn.addEventListener("click", function () {
 
+            messageErrorSelector.textContent = "";
 
             const existingPoll = getPoll();
 
@@ -192,7 +239,7 @@
 
                 for (let i = 0; i < existingPoll.options.length; i++) {
 
-                    if (optionInputs[i].value !== existingPoll.options[i].text) {
+                    if (optionInputs[i].value.trim() !== existingPoll.options[i].text) {
 
                         isValid = false;
                         break;    //stop for loop
@@ -202,29 +249,16 @@
 
 
 
-            if (existingPoll && pollQuestion.value === existingPoll.question && isValid) {
+            if (existingPoll && pollQuestion.value.trim() === existingPoll.question && isValid) {
 
-                alert("poll already exists!");
+                messageErrorSelector.textContent = "poll already exists!";
 
-                pollQuestion.style.display="none";
+                // alert("poll already exists!");
 
-               questionSelector.textContent= pollQuestion.value;
-
-            optionInputs.forEach(input => {
-            input.style.display="none";
-
-            })
-
-            optionSelector.innerHTML="";
-
-            optionInputs.forEach(input => {
-
-            optionSelector.innerHTML += `<p> ${input.value} </p>`;
-
-            })
+                showPreview();
 
 
-                
+
                 return;
 
             } else {
@@ -242,52 +276,110 @@
                 //     }
                 // })
 
+                let isVal = true;
 
                 if (!poll.question.trim()) {
-                    alert("Enter Question");
+                    questionErrorSelector.textContent = "Enter Question";
+
+                    pollQuestion.style.border = "2px solid red";
+
+                    isVal = false;
+                    //alert("Enter Question");
+                    // return;
+                } else {
+                    questionErrorSelector.textContent = "";
+                    pollQuestion.style.border = "2px solid black";
+                }
+
+
+                firstOptionErrorSelector.textContent = "";
+                secOptionErrorSelector.textContent = "";
+                thirdOptionErrorSelector.textContent = "";
+
+                for (let i = 0; i < optionInputs.length; i++) {
+
+                    const input = optionInputs[i];
+
+                    if (input.value.trim() !== "") {
+                        input.style.border = "2px solid black";
+                    }
+                }
+
+
+                for (let i = 0; i < optionInputs.length; i++) {
+
+                    const input = optionInputs[i];
+
+                    if (i == 0 && input.value.trim() === "") {
+                        firstOptionErrorSelector.textContent = "Add Option 1";
+
+                        optionInputs[i].style.border = "2px solid red";
+
+                        //alert("Add Options");
+
+                        isVal = false;
+
+                        //return;  //stop the function 
+                    }
+
+
+
+                    if (i == 1 && input.value.trim() === "") {
+
+                        secOptionErrorSelector.textContent = "Add Option 2";
+
+                        isVal = false;
+
+                        optionInputs[i].style.border = "2px solid red";
+
+                        //return;
+                    }
+
+                    if (i == 2 && input.value.trim() === "") {
+
+                        thirdOptionErrorSelector.textContent = "Add Option 3";
+
+                        isVal = false;
+
+                        optionInputs[i].style.border = "2px solid red";
+
+                        //return;
+                    }
+
+
+                    if (input.value.trim() !== "") {
+
+                        poll.options.push({ text: input.value.trim(), votes: 0 })
+                    }
+
+
+
+                }
+
+
+
+                if (!isVal) {
+
                     return;
                 }
 
 
 
-                for (const input of optionInputs) {
-                    if (input.value.trim() === "") {
-                        alert("Add Options");
-
-                        return;  //stop the function 
-                    }
-
-                    poll.options.push({ text: input.value, votes: 0 });
-
-                }
 
 
                 savePoll(poll);
 
-                pollQuestion.style.display="none";
+                showPreview();
 
-               questionSelector.textContent= pollQuestion.value;
 
-            optionInputs.forEach(input => {
-            input.style.display="none";
-
-            })
-
-            optionSelector.innerHTML="";
-
-            optionInputs.forEach(input => {
-
-            optionSelector.innerHTML += `<p> ${input.value} </p>`;
-
-            })
-
-               
 
                 //loadData();
 
                 alert("poll created");
 
             }
+
+
 
         })
 
@@ -297,17 +389,17 @@
 
             const poll = getPoll();
 
-            if(!poll){
+            if (!poll) {
                 alert("create poll first");
                 return;
             }
 
-            if(poll.isActive){
+            if (poll.isActive) {
                 alert("poll already started");
                 return;
             }
 
-           
+
 
             poll.isActive = true;
 
@@ -331,7 +423,7 @@
                 return;
             }
 
-            if(!poll.isActive){
+            if (!poll.isActive) {
                 alert("poll already stopped");
                 return;
             }
@@ -342,7 +434,7 @@
 
             //loadData();
 
-            
+
 
             alert("poll stopped");
 
@@ -357,7 +449,7 @@
                 return;
             }
 
-            
+
 
 
             poll.showResults = true;
@@ -366,9 +458,9 @@
 
             resultsSection.style.display = "block" //show again
 
-            
 
-           renderResults(poll);
+
+            renderResults(poll);
 
         })
 
@@ -417,24 +509,42 @@
                 return;
             }
 
+            let total = 0;
+
+            poll.options.forEach(option => {
+                total += Number(option.votes);
+
+            })
+
+            totalVotes.textContent = total;
+
+
             resultsSection.innerHTML = "";
 
             poll.options.forEach(option => {
 
-                resultsSection.innerHTML += `<p> ${option.text} : ${option.votes}</p>`
+                const percent = (Number(option.votes) / total) * 100;
+
+                resultsSection.innerHTML += `<div class="row"> 
+                    
+                <div style="margin-right:10px;" >    ${option.text}   </div>
+                    
+                    <div class="progress-container" >
+                <div class="progress-bar" style="width: ${percent}%"></div>
+            </div>
+
+              <div> ${percent}%    (${option.votes}) </div>
+                
+            
+                    
+                    
+                    
+                    </div>`
 
             })
 
 
 
-            let total=0;
-
-            poll.options.forEach(option => {
-            total += Number(option.votes);
-
-            })
-
-            totalVotes.textContent= total;
 
         }
 
@@ -453,7 +563,7 @@
 
                 })
 
-                
+
 
                 if (data.showResults) {
                     renderResults(data);
@@ -463,6 +573,37 @@
                 }
 
             }
+
+
+        }
+
+
+        function showPreview() {
+
+            pollQuestion.style.display = "none";
+
+            questionSelector.textContent = pollQuestion.value;
+
+            optionInputs.forEach(input => {
+                input.style.display = "none";
+
+            })
+
+            optionSelector.innerHTML = "";
+
+            optionInputs.forEach(input => {
+
+                if (input.value.trim() !== "") {
+
+                    optionSelector.innerHTML += `<p> ${input.value} </p>`;
+
+                }
+
+            })
+
+
+
+
 
 
         }
